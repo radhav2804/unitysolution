@@ -12,7 +12,11 @@
 // =========================================================================
 // Replace this with your deployed Google Apps Script Web App URL:
 // Example: "https://script.google.com/macros/s/AKfycbx.../exec"
+//const DEFAULT_GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyDJi1XyCFICBuV_YJhFBpIBmysov3xXQ4KB4MKYKMuBq5BdbKaY76edAginiejUQik/exec";
 const DEFAULT_GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyDJi1XyCFICBuV_YJhFBpIBmysov3xXQ4KB4MKYKMuBq5BdbKaY76edAginiejUQik/exec";
+
+//Library_url: https://script.google.com/macros/library/d/1-gS8S8KT39kbkswe_CbAybSK3VX0cUw2PW901B0DUfpkQ0M4NACmg05z/2
+
 
 // Local storage keys
 const STORAGE_KEYS = {
