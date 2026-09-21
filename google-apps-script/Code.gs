@@ -66,9 +66,71 @@ var HEADERS = [
 ];
 
 /**
- * Handle HTTP GET request (used for testing and health check)
+ * Handle HTTP GET request (used for health check & WhatsApp bot data fetching)
  */
 function doGet(e) {
+  var action = e && e.parameter ? e.parameter.action : "";
+
+  // Return clients list for the WhatsApp follow-up bot
+  if (action === "getClients") {
+    try {
+      var ss = SpreadsheetApp.getActiveSpreadsheet();
+      var sheet = ss.getSheetByName(SHEET_NAME);
+      if (!sheet || sheet.getLastRow() < 2) {
+        return createJsonResponse({
+          status: "success",
+          count: 0,
+          clients: []
+        });
+      }
+
+      var data = sheet.getDataRange().getValues();
+      var clients = [];
+
+      // Loop from row 2 (skipping header at row 1)
+      for (var i = 1; i < data.length; i++) {
+        var row = data[i];
+        var whatsappNum = String(row[14] || "").trim();      // Column 15: WhatsApp
+        var contactPersonNum = String(row[13] || "").trim(); // Column 14: Contact Person Number
+        var executivePhone = String(row[3] || "").trim();    // Column 4: Executive Contact Number
+
+        // Check WhatsApp first, then Contact Person Phone, then Executive Phone
+        var targetMobile = whatsappNum || contactPersonNum || executivePhone;
+        if (targetMobile) {
+          // Clean non-digits
+          var cleanedDigits = targetMobile.replace(/[^\d]/g, "");
+          if (cleanedDigits.length >= 10) {
+            clients.push({
+              row: i + 1,
+              date: row[1] || "",
+              executive: row[2] || "",
+              city: row[4] || "",
+              company: row[8] || "Valued Partner",
+              contactPerson: row[11] || "Sir/Madam",
+              designation: row[12] || "",
+              phone: cleanedDigits,
+              sourceField: whatsappNum ? "WhatsApp" : (contactPersonNum ? "Contact Number" : "Executive Phone"),
+              truckType: row[22] || "Trucks",
+              routes: row[27] || "All Corridors",
+              potential: row[34] || ""
+            });
+          }
+        }
+      }
+
+      return createJsonResponse({
+        status: "success",
+        count: clients.length,
+        clients: clients
+      });
+    } catch (err) {
+      return createJsonResponse({
+        status: "error",
+        message: "Failed to read clients: " + err.toString()
+      });
+    }
+  }
+
   var response = {
     status: "success",
     message: "Industry & Truck Opportunity Web App API is active and ready to accept submissions.",
