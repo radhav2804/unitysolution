@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Industry & Truck Opportunity Visit Form | Logistics Opportunity Tracker</title>
+  <meta name="description" content="High-performance field executive visit tracking tool for industrial logistics, freight opportunity estimation, and fleet demand capture.">
+  <meta name="theme-color" content="#0f172a">
+  
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons for crisp UI icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Navigation & Status Bar -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-wrapper">
+        <div class="brand-icon">
+          <i class="fa-solid fa-truck-ramp-box"></i>
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-title">Industry &amp; Truck Opportunity Visit Form</h1>
+          <p class="brand-tagline">Logistics Field Intelligence &amp; Lead Generation Portal</p>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <!-- Connectivity Status Pill -->
+        <div class="status-pill" id="networkStatus" title="Network connectivity status">
+          <span class="status-dot online"></span>
+          <span class="status-text" id="networkStatusText">Online</span>
+        </div>
+
+        <!-- Local History Button -->
+        <button type="button" class="btn-secondary-sm" id="btnOpenHistory" title="View locally logged visits">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span>Recent Logs (<span id="historyCount">0</span>)</span>
+        </button>
+
+        <!-- Quick Demo Fill Button for Testing -->
+        <button type="button" class="btn-demo-sm" id="btnFillDemo" title="Auto-fill sample data for rapid testing">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span>Fill Demo</span>
+        </button>
+
+        <!-- API Config Modal Trigger -->
+        <button type="button" class="btn-icon-sm" id="btnOpenSettings" title="Configure Web App Endpoint">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Notification Toast Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- Main Content Layout -->
+  <main class="main-container">
+    
+    <!-- Intro Banner & Required Field Notice -->
+    <div class="notice-banner">
+      <div class="notice-content">
+        <div class="notice-icon"><i class="fa-solid fa-circle-info"></i></div>
+        <div class="notice-text">
+          <strong>Field Staff Notice:</strong> Capture accurate industrial freight requirements. Fields marked with <span class="req-star">*</span> are mandatory. Offline submissions are safely cached locally.
+        </div>
+      </div>
+      <div class="active-executive-pill" id="executiveWelcomePill" style="display: none;">
+        <i class="fa-solid fa-user-check"></i>
+        <span>Executive: <strong id="executiveDisplayName">--</strong></span>
+      </div>
+    </div>
+
+    <!-- The Logistics Opportunity Form -->
+    <form id="opportunityForm" class="opportunity-form" novalidate autocomplete="off">
+      
+      <!-- =========================================================================
+           SECTION 1: VISIT INFORMATION
+           ========================================================================= -->
+      <section class="form-card" id="section-visit">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="step-badge">01</span>
+            <div class="card-headings">
+              <h2 class="card-title"><i class="fa-solid fa-location-dot"></i> Visit Information</h2>
+              <p class="card-subtitle">Executive identification, date, and field location details</p>
+            </div>
+          </div>
+          <span class="card-badge required-badge">Mandatory Details</span>
+        </div>
+
+        <div class="card-body form-grid">
+          <!-- Visit Date -->
+          <div class="form-group">
+            <label for="visitDate" class="field-label">
+              Visit Date <span class="req-star">*</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-regular fa-calendar input-icon"></i>
+              <input type="date" id="visitDate" name="visitDate" class="form-control" required>
+            </div>
+            <span class="error-feedback" id="error-visitDate"></span>
+          </div>
+
+          <!-- Field Executive Name -->
+          <div class="form-group">
+            <label for="executiveName" class="field-label">
+              Field Executive Name <span class="req-star">*</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-user input-icon"></i>
+              <input type="text" id="executiveName" name="executiveName" class="form-control" placeholder="e.g. Rahul Sharma" required>
+            </div>
+            <span class="field-hint">Auto-remembers your name for future visits</span>
+            <span class="error-feedback" id="error-executiveName"></span>
+          </div>
+
+          <!-- Executive Contact Number -->
+          <div class="form-group">
+            <label for="executiveContactNumber" class="field-label">
+              Executive Contact Number
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-phone input-icon"></i>
+              <input type="tel" id="executiveContactNumber" name="executiveContactNumber" class="form-control" placeholder="10-digit mobile number" maxlength="15">
+            </div>
+            <span class="error-feedback" id="error-executiveContactNumber"></span>
+          </div>
+
+          <!-- City -->
+          <div class="form-group">
+            <label for="city" class="field-label">
+              City / District
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-city input-icon"></i>
+              <input type="text" id="city" name="city" class="form-control" placeholder="e.g. Ahmedabad, Pune, Chennai">
+            </div>
+            <span class="error-feedback" id="error-city"></span>
+          </div>
+
+          <!-- Area / Location -->
+          <div class="form-group">
+            <label for="area" class="field-label">
+              Area / Industrial Estate
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-map-pin input-icon"></i>
+              <input type="text" id="area" name="area" class="form-control" placeholder="e.g. Sanand GIDC, Chakan MIDC, Ambattur">
+            </div>
+            <span class="error-feedback" id="error-area"></span>
+          </div>
+
+          <!-- GPS Location with Auto-Detect -->
+          <div class="form-group">
+            <label for="gpsLocation" class="field-label">
+              GPS Coordinates (Optional)
+            </label>
+            <div class="input-group-action">
+              <div class="input-wrapper">
+                <i class="fa-solid fa-crosshairs input-icon"></i>
+                <input type="text" id="gpsLocation" name="gpsLocation" class="form-control" placeholder="Lat, Long (e.g. 23.0225, 72.5714)">
+              </div>
+              <button type="button" class="btn-input-action" id="btnDetectGps" title="Auto-detect current GPS location">
+                <i class="fa-solid fa-location-crosshairs"></i>
+                <span>Locate</span>
+              </button>
+            </div>
+            <span class="field-hint" id="gpsHint">Click 'Locate' to grab device coordinates</span>
+            <span class="error-feedback" id="error-gpsLocation"></span>
+          </div>
+
+          <!-- Visit Type -->
+          <div class="form-group full-width">
+            <label for="visitType" class="field-label">
+              Visit Type
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-tags input-icon"></i>
+              <select id="visitType" name="visitType" class="form-control">
+                <option value="First Visit" selected>First Visit</option>
+                <option value="Follow-up Visit">Follow-up Visit</option>
+                <option value="Existing Customer">Existing Customer</option>
+                <option value="Referral">Referral</option>
+              </select>
+            </div>
+            <span class="error-feedback" id="error-visitType"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================================
+           SECTION 2: INDUSTRY INFORMATION
+           ========================================================================= -->
+      <section class="form-card" id="section-industry">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="step-badge">02</span>
+            <div class="card-headings">
+              <h2 class="card-title"><i class="fa-solid fa-industry"></i> Industry Information</h2>
+              <p class="card-subtitle">Company profile, key decision maker, and communication channels</p>
+            </div>
+          </div>
+          <span class="card-badge required-badge">Company Profile</span>
+        </div>
+
+        <div class="card-body form-grid">
+          <!-- Industry / Company Name -->
+          <div class="form-group">
+            <label for="industryName" class="field-label">
+              Industry / Company Name <span class="req-star">*</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-building input-icon"></i>
+              <input type="text" id="industryName" name="industryName" class="form-control" placeholder="e.g. Supreme Industries Ltd." required>
+            </div>
+            <span class="error-feedback" id="error-industryName"></span>
+          </div>
+
+          <!-- Industry Type -->
+          <div class="form-group">
+            <label for="industryType" class="field-label">
+              Industry Type <span class="req-star">*</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-layer-group input-icon"></i>
+              <select id="industryType" name="industryType" class="form-control" required>
+                <option value="" disabled selected>-- Select Industry Sector --</option>
+                <option value="Manufacturing">Manufacturing</option>
+                <option value="Automobile">Automobile</option>
+                <option value="Textile">Textile</option>
+                <option value="Steel">Steel</option>
+                <option value="Chemical">Chemical</option>
+                <option value="Pharmaceutical">Pharmaceutical</option>
+                <option value="Food & Beverage">Food &amp; Beverage</option>
+                <option value="FMCG">FMCG</option>
+                <option value="Construction">Construction</option>
+                <option value="E-commerce">E-commerce</option>
+                <option value="Logistics / Warehouse">Logistics / Warehouse</option>
+                <option value="Agriculture">Agriculture</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <span class="error-feedback" id="error-industryType"></span>
+          </div>
+
+          <!-- Company Address -->
+          <div class="form-group full-width">
+            <label for="companyAddress" class="field-label">
+              Company Address / Plant Location
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-map-location-dot input-icon-textarea"></i>
+              <textarea id="companyAddress" name="companyAddress" class="form-control" rows="2" placeholder="Complete factory or registered office address with landmark..."></textarea>
+            </div>
+            <span class="error-feedback" id="error-companyAddress"></span>
+          </div>
+
+          <!-- Contact Person Name -->
+          <div class="form-group">
+            <label for="contactPerson" class="field-label">
+              Contact Person Name
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-id-badge input-icon"></i>
+              <input type="text" id="contactPerson" name="contactPerson" class="form-control" placeholder="e.g. Rajesh Patel">
+            </div>
+            <span class="error-feedback" id="error-contactPerson"></span>
+          </div>
+
+          <!-- Contact Person Designation -->
+          <div class="form-group">
+            <label for="designation" class="field-label">
+              Contact Person Designation
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-briefcase input-icon"></i>
+              <input type="text" id="designation" name="designation" class="form-control" placeholder="e.g. Logistics Manager / Dispatch Head / Plant Head">
+            </div>
+            <span class="error-feedback" id="error-designation"></span>
+          </div>
+
+          <!-- Contact Person Phone Number -->
+          <div class="form-group">
+            <label for="contactPersonNumber" class="field-label">
+              Contact Number
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-phone input-icon"></i>
+              <input type="tel" id="contactPersonNumber" name="contactPersonNumber" class="form-control" placeholder="e.g. 9876543210" maxlength="15">
+            </div>
+            <span class="error-feedback" id="error-contactPersonNumber"></span>
+          </div>
+
+          <!-- WhatsApp Number -->
+          <div class="form-group">
+            <label for="whatsapp" class="field-label">
+              WhatsApp Number
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-brands fa-whatsapp input-icon"></i>
+              <input type="tel" id="whatsapp" name="whatsapp" class="form-control" placeholder="e.g. 9876543210" maxlength="15">
+            </div>
+            <span class="field-hint">Used for freight rates &amp; tracking updates</span>
+            <span class="error-feedback" id="error-whatsapp"></span>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email" class="field-label">
+              Official Email Address
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-regular fa-envelope input-icon"></i>
+              <input type="email" id="email" name="email" class="form-control" placeholder="name@company.com">
+            </div>
+            <span class="error-feedback" id="error-email"></span>
+          </div>
+
+          <!-- Website -->
+          <div class="form-group">
+            <label for="website" class="field-label">
+              Website
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-globe input-icon"></i>
+              <input type="url" id="website" name="website" class="form-control" placeholder="https://www.company.com">
+            </div>
+            <span class="error-feedback" id="error-website"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================================
+           SECTION 3: TRANSPORTATION / TRUCK OPPORTUNITY
+           ========================================================================= -->
+      <section class="form-card" id="section-transport">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="step-badge">03</span>
+            <div class="card-headings">
+              <h2 class="card-title"><i class="fa-solid fa-truck-moving"></i> Transportation / Truck Opportunity</h2>
+              <p class="card-subtitle">Fleet demand, vehicle requirements, load specifications, and primary lanes</p>
+            </div>
+          </div>
+          <span class="card-badge info-badge">Core Opportunity</span>
+        </div>
+
+        <div class="card-body form-grid">
+          <!-- Current Transportation Requirement -->
+          <div class="form-group">
+            <label for="transportationRequirement" class="field-label">
+              Does company require transportation?
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-circle-question input-icon"></i>
+              <select id="transportationRequirement" name="transportationRequirement" class="form-control">
+                <option value="Yes" selected>Yes - Active Requirement</option>
+                <option value="No">No - No current need</option>
+                <option value="Potential Future Requirement">Potential Future Requirement</option>
+              </select>
+            </div>
+            <span class="error-feedback" id="error-transportationRequirement"></span>
+          </div>
+
+          <!-- Type of Transportation -->
+          <div class="form-group">
+            <label for="transportationType" class="field-label">
+              Type of Transportation
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-arrow-right-arrow-left input-icon"></i>
+              <select id="transportationType" name="transportationType" class="form-control">
+                <option value="Outbound" selected>Outbound (Finished Goods / Dispatch)</option>
+                <option value="Inbound">Inbound (Raw Material Supply)</option>
+                <option value="Both">Both (Inbound &amp; Outbound)</option>
+              </select>
+            </div>
+            <span class="error-feedback" id="error-transportationType"></span>
+          </div>
+
+          <!-- Truck Requirement Frequency -->
+          <div class="form-group">
+            <label for="requirementFrequency" class="field-label">
+              Truck Requirement Frequency
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-repeat input-icon"></i>
+              <select id="requirementFrequency" name="requirementFrequency" class="form-control">
+                <option value="Daily" selected>Daily</option>
+                <option value="Weekly">Weekly</option>
+                <option value="Monthly">Monthly</option>
+                <option value="Occasional">Occasional</option>
+                <option value="Seasonal">Seasonal</option>
+              </select>
+            </div>
+            <span class="error-feedback" id="error-requirementFrequency"></span>
+          </div>
+
+          <!-- Approximate Trucks Per Day -->
+          <div class="form-group">
+            <label for="trucksPerDay" class="field-label">
+              Approx. Trucks Required Per Day
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-hashtag input-icon"></i>
+              <input type="number" id="trucksPerDay" name="trucksPerDay" class="form-control" min="0" step="1" placeholder="e.g. 3">
+            </div>
+            <span class="error-feedback" id="error-trucksPerDay"></span>
+          </div>
+
+          <!-- Approximate Trucks Per Month -->
+          <div class="form-group">
+            <label for="trucksPerMonth" class="field-label">
+              Approx. Trucks Required Per Month
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-calendar-days input-icon"></i>
+              <input type="number" id="trucksPerMonth" name="trucksPerMonth" class="form-control" min="0" step="1" placeholder="e.g. 75">
+            </div>
+            <span class="error-feedback" id="error-trucksPerMonth"></span>
+          </div>
+
+          <!-- Truck Type Required -->
+          <div class="form-group">
+            <label for="truckType" class="field-label">
+              Truck Type Required
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-truck-front input-icon"></i>
+              <select id="truckType" name="truckType" class="form-control">
+                <option value="" disabled selected>-- Select Vehicle Size --</option>
+                <option value="14 FT">14 FT</option>
+                <option value="17 FT">17 FT</option>
+                <option value="19 FT">19 FT</option>
+                <option value="20 FT">20 FT</option>
+                <option value="22 FT">22 FT</option>
+                <option value="24 FT">24 FT</option>
+                <option value="32 FT">32 FT (Multi-Axle / SXL / MXL)</option>
+                <option value="Trailer">Trailer (40 FT / Low Bed / High Bed)</option>
+                <option value="Container">Container (20 FT / 40 FT)</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <span class="error-feedback" id="error-truckType"></span>
+          </div>
+
+          <!-- Vehicle Body Type -->
+          <div class="form-group">
+            <label for="vehicleBodyType" class="field-label">
+              Vehicle Body Type
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-box-open input-icon"></i>
+              <select id="vehicleBodyType" name="vehicleBodyType" class="form-control">
+                <option value="" disabled selected>-- Select Body Type --</option>
+                <option value="Open">Open Body (Tarpaulin)</option>
+                <option value="Closed">Closed Body / Hard Top</option>
+                <option value="Container">Container Body</option>
+                <option value="Refrigerated">Refrigerated / Reefer</option>
+                <option value="Tanker">Tanker (Liquid / Gas / Chemical)</option>
+                <option value="Flatbed">Flatbed</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <span class="error-feedback" id="error-vehicleBodyType"></span>
+          </div>
+
+          <!-- Approximate Load Weight -->
+          <div class="form-group">
+            <label for="loadWeight" class="field-label">
+              Approximate Load Weight
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-weight-hanging input-icon"></i>
+              <input type="text" id="loadWeight" name="loadWeight" class="form-control" placeholder="e.g. 15 MT / 25 Tons / 7.5 MT">
+            </div>
+            <span class="error-feedback" id="error-loadWeight"></span>
+          </div>
+
+          <!-- Loading Location -->
+          <div class="form-group">
+            <label for="loadingLocation" class="field-label">
+              Loading Location (Origin)
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-warehouse input-icon"></i>
+              <input type="text" id="loadingLocation" name="loadingLocation" class="form-control" placeholder="e.g. Sanand Factory Gate 2">
+            </div>
+            <span class="error-feedback" id="error-loadingLocation"></span>
+          </div>
+
+          <!-- Unloading Location -->
+          <div class="form-group">
+            <label for="unloadingLocation" class="field-label">
+              Unloading Location (Destinations)
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-dolly input-icon"></i>
+              <input type="text" id="unloadingLocation" name="unloadingLocation" class="form-control" placeholder="e.g. Delhi NCR, Bhiwandi, Bangalore Hub">
+            </div>
+            <span class="error-feedback" id="error-unloadingLocation"></span>
+          </div>
+
+          <!-- Main Transportation Routes / Destinations -->
+          <div class="form-group full-width">
+            <label for="routes" class="field-label">
+              Main Transportation Routes / Key Corridors
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-route input-icon"></i>
+              <input type="text" id="routes" name="routes" class="form-control" placeholder="e.g. Ahmedabad -> Mumbai -> Pune; Gujarat to Pan-India">
+            </div>
+            <span class="error-feedback" id="error-routes"></span>
+          </div>
+
+          <!-- Approximate Monthly Shipment Volume -->
+          <div class="form-group full-width">
+            <label for="monthlyShipmentVolume" class="field-label">
+              Approximate Monthly Shipment Volume
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-chart-line input-icon"></i>
+              <input type="text" id="monthlyShipmentVolume" name="monthlyShipmentVolume" class="form-control" placeholder="e.g. 500 Metric Tons / 120 Shipments / 85 FTL loads">
+            </div>
+            <span class="error-feedback" id="error-monthlyShipmentVolume"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================================
+           SECTION 4: BUSINESS OPPORTUNITY
+           ========================================================================= -->
+      <section class="form-card" id="section-business">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="step-badge">04</span>
+            <div class="card-headings">
+              <h2 class="card-title"><i class="fa-solid fa-handshake"></i> Business Opportunity &amp; Competition</h2>
+              <p class="card-subtitle">Existing vendor benchmarks, freight rates, pain points, and deal potential</p>
+            </div>
+          </div>
+          <span class="card-badge highlight-badge">Commercials</span>
+        </div>
+
+        <div class="card-body form-grid">
+          <!-- Current Transporter / Vendor Name -->
+          <div class="form-group">
+            <label for="currentTransporter" class="field-label">
+              Current Transporter / Vendor Name
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-truck-field input-icon"></i>
+              <input type="text" id="currentTransporter" name="currentTransporter" class="form-control" placeholder="e.g. VRL Logistics, TCI, Local Broker">
+            </div>
+            <span class="error-feedback" id="error-currentTransporter"></span>
+          </div>
+
+          <!-- Current Freight Rate -->
+          <div class="form-group">
+            <label for="currentFreightRate" class="field-label">
+              Current Freight Rate (Optional)
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-indian-rupee-sign input-icon"></i>
+              <input type="text" id="currentFreightRate" name="currentFreightRate" class="form-control" placeholder="e.g. ₹42,000 / trip or ₹2.8 / kg">
+            </div>
+            <span class="error-feedback" id="error-currentFreightRate"></span>
+          </div>
+
+          <!-- Expected Freight Rate -->
+          <div class="form-group">
+            <label for="expectedFreightRate" class="field-label">
+              Expected Freight Rate (Optional)
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-tag input-icon"></i>
+              <input type="text" id="expectedFreightRate" name="expectedFreightRate" class="form-control" placeholder="e.g. ₹38,000 / trip or ₹2.5 / kg">
+            </div>
+            <span class="error-feedback" id="error-expectedFreightRate"></span>
+          </div>
+
+          <!-- Payment Terms -->
+          <div class="form-group">
+            <label for="paymentTerms" class="field-label">
+              Payment Terms
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-file-invoice-dollar input-icon"></i>
+              <select id="paymentTerms" name="paymentTerms" class="form-control">
+                <option value="30 Days" selected>30 Days</option>
+                <option value="Advance">Advance (Immediate)</option>
+                <option value="7 Days">7 Days</option>
+                <option value="15 Days">15 Days</option>
+                <option value="45 Days">45 Days</option>
+                <option value="60 Days">60 Days</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <span class="error-feedback" id="error-paymentTerms"></span>
+          </div>
+
+          <!-- Main Problem With Current Transporter -->
+          <div class="form-group">
+            <label for="transporterProblem" class="field-label">
+              Main Problem With Current Transporter
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-triangle-exclamation input-icon"></i>
+              <select id="transporterProblem" name="transporterProblem" class="form-control">
+                <option value="Vehicle Availability" selected>Vehicle Availability (Shortage of trucks)</option>
+                <option value="High Freight">High Freight / Uncompetitive Rates</option>
+                <option value="Delayed Delivery">Delayed Delivery / Transit Issues</option>
+                <option value="Vehicle Quality">Vehicle Quality / Damaged Tarpaulin</option>
+                <option value="Tracking Problem">Tracking Problem / No GPS visibility</option>
+                <option value="Payment Issue">Payment / Billing Discrepancies</option>
+                <option value="Driver Issue">Driver Issue / Unprofessional behavior</option>
+                <option value="No Major Problem">No Major Problem (Satisfied)</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <span class="error-feedback" id="error-transporterProblem"></span>
+          </div>
+
+          <!-- Opportunity Potential -->
+          <div class="form-group">
+            <label for="opportunityPotential" class="field-label">
+              Opportunity Potential
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-gauge-high input-icon"></i>
+              <select id="opportunityPotential" name="opportunityPotential" class="form-control">
+                <option value="High" selected>🔥 High Potential (Urgent Need / Dissatisfied)</option>
+                <option value="Medium">⚡ Medium Potential (Quote Comparison)</option>
+                <option value="Low">🧊 Low Potential (Locked Contract / Low Volume)</option>
+              </select>
+            </div>
+            <span class="error-feedback" id="error-opportunityPotential"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================================
+           SECTION 5: ADDITIONAL INFORMATION
+           ========================================================================= -->
+      <section class="form-card" id="section-additional">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="step-badge">05</span>
+            <div class="card-headings">
+              <h2 class="card-title"><i class="fa-solid fa-folder-open"></i> Additional Information &amp; Documents</h2>
+              <p class="card-subtitle">Visiting card capture, brochure notes, and special instructions</p>
+            </div>
+          </div>
+          <span class="card-badge optional-badge">Attachments &amp; Notes</span>
+        </div>
+
+        <div class="card-body form-grid">
+          <!-- Visiting Card / Document Picker -->
+          <div class="form-group full-width">
+            <label for="visitingCardFile" class="field-label">
+              Upload Visiting Card / Document Photo (Optional)
+            </label>
+            <div class="file-upload-zone" id="fileUploadZone">
+              <input type="file" id="visitingCardFile" accept="image/*,.pdf" class="file-input-hidden">
+              <div class="file-upload-content" id="uploadPlaceholder">
+                <div class="upload-icon-circle">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <div class="upload-text-group">
+                  <p class="upload-primary-text">Click or tap to snap / upload visiting card</p>
+                  <p class="upload-sub-text">Supports JPG, PNG, WEBP or PDF (Max 2MB)</p>
+                </div>
+              </div>
+              <!-- Upload Preview Container -->
+              <div class="file-preview-card" id="filePreviewCard" style="display: none;">
+                <div class="file-thumb" id="fileThumbnail">
+                  <i class="fa-solid fa-file-image"></i>
+                </div>
+                <div class="file-meta">
+                  <span class="file-name" id="previewFileName">card_photo.jpg</span>
+                  <span class="file-size" id="previewFileSize">145 KB</span>
+                </div>
+                <button type="button" class="btn-remove-file" id="btnRemoveFile" title="Remove attached file">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+            <span class="error-feedback" id="error-visitingCardFile"></span>
+          </div>
+
+          <!-- Additional Remarks -->
+          <div class="form-group full-width">
+            <label for="additionalRemarks" class="field-label">
+              Additional Remarks
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-pen-nib input-icon-textarea"></i>
+              <textarea id="additionalRemarks" name="additionalRemarks" class="form-control" rows="2" placeholder="Any other observations, competitor presence, loading bay restrictions..."></textarea>
+            </div>
+            <span class="error-feedback" id="error-additionalRemarks"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================================
+           FORM ACTIONS BAR
+           ========================================================================= -->
+      <div class="form-actions-bar">
+        <div class="actions-left">
+          <button type="button" class="btn btn-secondary" id="btnResetForm">
+            <i class="fa-solid fa-rotate-left"></i>
+            <span>Reset Form</span>
+          </button>
+        </div>
+
+        <div class="actions-right">
+          <button type="submit" class="btn btn-primary" id="btnSubmitForm">
+            <span class="btn-spinner" id="submitSpinner"></span>
+            <i class="fa-solid fa-paper-plane" id="submitIcon"></i>
+            <span id="submitText">Submit Opportunity</span>
+          </button>
+        </div>
+      </div>
+
+    </form>
+
+  </main>
+
+  <!-- =========================================================================
+       SUBMISSION SUCCESS MODAL
+       ========================================================================= -->
+  <div class="modal-overlay" id="successModal" aria-hidden="true" role="dialog">
+    <div class="modal-card">
+      <div class="modal-header-banner success-banner">
+        <div class="modal-icon-circle success-circle">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <h2 class="modal-title">Opportunity Recorded!</h2>
+        <p class="modal-subtitle">The visit data has been safely synced with Google Sheets.</p>
+      </div>
+      <div class="modal-body">
+        <div class="summary-list">
+          <div class="summary-item">
+            <span class="summary-label"><i class="fa-solid fa-building"></i> Company:</span>
+            <strong class="summary-value" id="summaryCompany">--</strong>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label"><i class="fa-solid fa-calendar"></i> Date:</span>
+            <span class="summary-value" id="summaryDate">--</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label"><i class="fa-solid fa-user"></i> Executive:</span>
+            <span class="summary-value" id="summaryExecutive">--</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label"><i class="fa-solid fa-truck"></i> Fleet Need:</span>
+            <span class="summary-value" id="summaryFleet">--</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label"><i class="fa-solid fa-clock"></i> Timestamp:</span>
+            <span class="summary-value" id="summaryTimestamp">--</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary full-width" id="btnCloseSuccessModal">
+          <i class="fa-solid fa-plus"></i>
+          <span>Log Another Visit</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       SUBMISSION ERROR MODAL
+       ========================================================================= -->
+  <div class="modal-overlay" id="errorModal" aria-hidden="true" role="dialog">
+    <div class="modal-card">
+      <div class="modal-header-banner error-banner">
+        <div class="modal-icon-circle error-circle">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h2 class="modal-title">Submission Issue</h2>
+        <p class="modal-subtitle" id="errorModalSubtitle">Unable to connect to Google Apps Script Web App</p>
+      </div>
+      <div class="modal-body">
+        <div class="alert-box error-alert" id="errorModalMessage">
+          The request could not be completed. We have safely saved this entry in your device's offline logs.
+        </div>
+        <p class="modal-instruction">
+          <strong>Troubleshooting Tips:</strong>
+          <br>1. Ensure your Google Apps Script is deployed as a <em>Web App</em> with access set to <em>"Anyone"</em>.
+          <br>2. Check that the Web App URL configured in Settings is current.
+        </p>
+      </div>
+      <div class="modal-footer modal-actions-split">
+        <button type="button" class="btn btn-secondary" id="btnCloseErrorModal">
+          <span>Dismiss</span>
+        </button>
+        <button type="button" class="btn btn-primary" id="btnRetrySubmit">
+          <i class="fa-solid fa-arrows-rotate"></i>
+          <span>Retry Now</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       RECENT LOCAL VISITS HISTORY MODAL / DRAWER
+       ========================================================================= -->
+  <div class="modal-overlay" id="historyModal" aria-hidden="true" role="dialog">
+    <div class="modal-card modal-large">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <h3>Recent Opportunity Logs (Device Cache)</h3>
+        </div>
+        <button type="button" class="modal-close-btn" id="btnCloseHistoryModal" title="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="history-controls">
+          <div class="input-wrapper search-box">
+            <i class="fa-solid fa-magnifying-glass input-icon"></i>
+            <input type="text" id="historySearchInput" class="form-control" placeholder="Search by company, city, executive...">
+          </div>
+          <button type="button" class="btn btn-secondary-sm" id="btnExportCsv" title="Download as CSV">
+            <i class="fa-solid fa-file-csv"></i>
+            <span>Export CSV</span>
+          </button>
+          <button type="button" class="btn btn-outline-danger-sm" id="btnClearHistory" title="Clear local cache">
+            <i class="fa-solid fa-trash-can"></i>
+            <span>Clear</span>
+          </button>
+        </div>
+
+        <div class="history-table-container">
+          <div id="historyEmptyState" class="empty-history-state" style="display: none;">
+            <i class="fa-solid fa-inbox empty-icon"></i>
+            <h4>No visits logged yet</h4>
+            <p>Submissions from this device will appear here.</p>
+          </div>
+          <table class="history-table" id="historyTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Company</th>
+                <th>City</th>
+                <th>Truck Req.</th>
+                <th>Potential</th>
+                <th>Synced</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody">
+              <!-- Rendered via script.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btnFooterCloseHistory">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       SETTINGS & API CONFIGURATION MODAL
+       ========================================================================= -->
+  <div class="modal-overlay" id="settingsModal" aria-hidden="true" role="dialog">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-sliders"></i>
+          <h3>Google Sheet API Settings</h3>
+        </div>
+        <button type="button" class="modal-close-btn" id="btnCloseSettingsModal" title="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="settings-intro">
+          Submissions are dispatched to your Google Apps Script Web App. You can test connectivity or override the endpoint URL here.
+        </p>
+
+        <div class="form-group">
+          <label for="settingApiUrl" class="field-label">
+            Google Apps Script Web App URL
+          </label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-link input-icon"></i>
+            <input type="url" id="settingApiUrl" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
+          </div>
+          <span class="field-hint">Default is defined in <code>script.js</code>. Changing here overrides for this browser.</span>
+        </div>
+
+        <div class="endpoint-test-section">
+          <button type="button" class="btn btn-secondary-sm" id="btnTestApiEndpoint">
+            <i class="fa-solid fa-bolt"></i>
+            <span>Test Connection (Ping)</span>
+          </button>
+          <span id="endpointTestResult" class="endpoint-test-badge"></span>
+        </div>
+      </div>
+      <div class="modal-footer modal-actions-split">
+        <button type="button" class="btn btn-secondary" id="btnResetApiUrl">
+          <i class="fa-solid fa-arrow-rotate-left"></i>
+          <span>Reset Default</span>
+        </button>
+        <button type="button" class="btn btn-primary" id="btnSaveApiUrl">
+          <i class="fa-solid fa-floppy-disk"></i>
+          <span>Save Settings</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>&copy; Logistics Opportunity Tracker &bull; Designed for Industrial Fleet Sales &amp; Field Staff &bull; GitHub Pages Ready</p>
+    </div>
+  </footer>
+
+  <!-- Application Logic -->
+  <script src="script.js"></script>
+</body>
+</html>
