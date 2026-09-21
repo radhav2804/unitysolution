@@ -12,7 +12,7 @@
 // =========================================================================
 // Replace this with your deployed Google Apps Script Web App URL:
 // Example: "https://script.google.com/macros/s/AKfycbx.../exec"
-const DEFAULT_GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/YOUR_APPS_SCRIPT_ID/exec";
+const DEFAULT_GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyDJi1XyCFICBuV_YJhFBpIBmysov3xXQ4KB4MKYKMuBq5BdbKaY76edAginiejUQik/exec";
 
 // Local storage keys
 const STORAGE_KEYS = {
