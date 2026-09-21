@@ -144,6 +144,33 @@ function doPost(e) {
     var tz = ss.getSpreadsheetTimeZone() || "GMT";
     var formattedTimestamp = Utilities.formatDate(new Date(), tz, "yyyy-MM-dd HH:mm:ss");
 
+    // Handle File / Visiting Card upload to Google Drive
+    var fileUrlOrNote = "";
+    if (data.fileBase64 && data.fileName) {
+      try {
+        var folderName = "Logistics Opportunity Documents";
+        var folders = DriveApp.getFoldersByName(folderName);
+        var folder = folders.hasNext() ? folders.next() : DriveApp.createFolder(folderName);
+
+        var base64Content = data.fileBase64;
+        if (base64Content.indexOf("base64,") > -1) {
+          base64Content = base64Content.split("base64,")[1];
+        }
+
+        var decodedBytes = Utilities.base64Decode(base64Content);
+        var mimeType = data.fileMimeType || "image/jpeg";
+        var blob = Utilities.newBlob(decodedBytes, mimeType, data.fileName);
+        var driveFile = folder.createFile(blob);
+        driveFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+        fileUrlOrNote = driveFile.getUrl();
+      } catch (fileErr) {
+        fileUrlOrNote = (data.documentNote || data.fileName) + " (Drive upload note: " + fileErr.message + ")";
+      }
+    } else {
+      fileUrlOrNote = data.documentNote || data.documentName || "";
+    }
+
     // Assemble row values in exact header order
     var row = [
       formattedTimestamp,
@@ -186,7 +213,7 @@ function doPost(e) {
       data.followUpPerson || "",
       data.notes || "",
       data.additionalRemarks || "",
-      data.documentNote || data.documentName || ""
+      fileUrlOrNote
     ];
 
     // Append the row

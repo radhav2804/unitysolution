@@ -389,7 +389,10 @@ function validateForm() {
     notes: "",
     additionalRemarks: getVal("additionalRemarks"),
     documentName: state.attachedFile ? state.attachedFile.name : "",
-    documentNote: state.attachedFile ? `File attached: ${state.attachedFile.name} (${Math.round(state.attachedFile.size / 1024)} KB)` : ""
+    documentNote: state.attachedFile ? `File attached: ${state.attachedFile.name} (${Math.round(state.attachedFile.size / 1024)} KB)` : "",
+    fileBase64: state.attachedFileBase64 || "",
+    fileName: state.attachedFile ? state.attachedFile.name : "",
+    fileMimeType: state.attachedFile ? state.attachedFile.type : ""
   };
 
   return payload;
@@ -630,18 +633,17 @@ function handleFileSelect() {
   elements.previewFileName.textContent = file.name;
   elements.previewFileSize.textContent = `${Math.round(file.size / 1024)} KB`;
 
-  // Render preview if image
-  if (file.type.startsWith("image/")) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
+  // Read file as base64 for upload to Google Drive
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    state.attachedFileBase64 = e.target.result;
+    if (file.type.startsWith("image/")) {
       elements.fileThumbnail.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
-      state.attachedFileBase64 = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  } else {
-    elements.fileThumbnail.innerHTML = `<i class="fa-solid fa-file-pdf"></i>`;
-    state.attachedFileBase64 = null;
-  }
+    } else {
+      elements.fileThumbnail.innerHTML = `<i class="fa-solid fa-file-pdf"></i>`;
+    }
+  };
+  reader.readAsDataURL(file);
 
   elements.uploadPlaceholder.style.display = "none";
   elements.filePreviewCard.style.display = "flex";
