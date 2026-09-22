@@ -1,0 +1,39 @@
+# Node dependencies (Never commit node_modules)
+node_modules/
+*/node_modules/
+package-lock.json
+
+# WhatsApp Web Session & Authentication data
+.wwebjs_auth/
+*/.wwebjs_auth/
+.wwebjs_cache/
+*/.wwebjs_cache/
+
+# Bot sent history log
+sent_history.json
+*/sent_history.json
+
+# Local lead data sheets (prevent uploading sensitive contact details)
+leads.xlsx
+*/leads.xlsx
+*.xlsx
+*.xls
+
+# Logs and runtime files
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Environment variables & personal config overrides
+.env
+.env.*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# IDE & Editor files
+.vscode/
+.idea/
