@@ -1,0 +1,25 @@
+{
+  "name": "logistics-whatsapp-followup-bot",
+  "version": "1.0.0",
+  "description": "Automated WhatsApp follow-up bot to send visiting card image and message to clients from Google Sheet / Excel",
+  "main": "send_followups.js",
+  "scripts": {
+    "start": "node send_followups.js"
+  },
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "followup",
+    "logistics",
+    "google-sheets",
+    "excel"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-fetch": "^2.6.9",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.26.0",
+    "xlsx": "^0.18.5"
+  }
+}
